@@ -21,6 +21,11 @@ This plugin allows you to directly invoke the built-in host-level web search ser
    - **This Plugin flow**: User prompt ➔ Click button ➔ Direct host execution of DeepSeek Web Search ➔ Results injected immediately. **Takes ~1 second, consumes 0 LLM tokens!**
 3. **Seamless Native UI Integration**  
    Mounts cleanly in the input bar left slot (`conversation.input.left`), matching DSH `--dsw-*` design tokens, supporting dark/light mode, live draft detection, and loading states.
+4. **Solving Model Laziness & Hallucination (Why a Persistent Toggle?)**  
+   *“If some agent models can occasionally invoke search on their own, why is a dedicated toggle switch needed?”*  
+   - **Eliminating Cognitive Overconfidence**: Without explicit constraints, LLMs frequently hallucinate answers based on outdated pre-training cutoff data instead of actively initiating web retrieval.
+   - **100% Deterministic Behavioral Constraint**: Switching to the 【Lit Up】 state injects a strict system-level prompt constraint, ensuring the model **MUST** search the web before answering any temporal, factual, or technical query.
+   - **Frictionless Control**: Click again to 【Dim】, instantly reverting to normal conversational mode without disrupting text input.
 
 ---
 
