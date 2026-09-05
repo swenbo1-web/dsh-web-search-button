@@ -156,15 +156,19 @@ DSH Desktop active profile is located at `%APPDATA%\dsh-desktop\harness\profiles
 
 ## 💡 Usage
 
-### Mode 1: Composer Button
-1. Open any session, type your question or query in the chat input box.
-2. The **🌐 联网搜索** button on the left of the input bar will light up.
-3. Click the button; real-time search results are fetched and inserted immediately into the chat!
+### Mode 1: Composer Button & Persistent Mode Toggle
+1. Open any session; the **🌐 联网搜索** button is displayed on the bottom-left of the input bar.
+2. Click the button to open a non-blocking configuration popover (**can be cancelled anytime by clicking outside or on "取消", never locking the input box**):
+   - Click **"✅ 开启后续自动联网搜索"**: Activates persistent Web Search Mode for this session. The button turns into an active tag `[ 🌐 联网搜索 · 已开启 ✕ ]`. All subsequent conversation questions default to using web search!
+   - Click the **`✕`** icon: Cancels and exits Web Search Mode at any time.
+   - If draft text is present, an option **"⚡ 立即单次检索当前输入内容"** allows immediate one-shot query execution.
 
 ### Mode 2: Slash Command
-Type `/search <keyword>` directly into the input box and press Enter:
+Type slash commands directly into the input bar and press Enter:
 ```text
-/search Latest open-source LLM releases
+/search <keyword>     # One-shot direct web search
+/search on            # Enable persistent Web Search Mode for this session
+/search off           # Disable Web Search Mode for this session
 ```
 
 ---
