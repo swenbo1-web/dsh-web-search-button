@@ -16,23 +16,43 @@ export interface ZoneProps {
 
 export interface SearchButtonProps {
   zone?: ZoneProps;
+  input?: {
+    draft: string;
+    [key: string]: any;
+  };
+  session?: {
+    sessionId: string;
+    [key: string]: any;
+  };
   sessionId?: string;
   onSearch?: (query: string, sid?: string) => Promise<any>;
 }
 
-export function SearchButton({ zone, sessionId, onSearch }: SearchButtonProps) {
+export function SearchButton(props: SearchButtonProps) {
   const [busy, setBusy] = useState(false);
-  const draft = zone?.input?.draft?.trim() ?? "";
-  const currentSessionId = zone?.session?.sessionId ?? sessionId;
-  const disabled = busy || !draft || !onSearch;
+
+  const inputObj = props.input ?? props.zone?.input;
+  const draft = (typeof inputObj?.draft === "string" ? inputObj.draft : "").trim();
+  const sessionObj = props.session ?? props.zone?.session;
+  const currentSessionId = sessionObj?.sessionId ?? props.sessionId;
+  const canRun = typeof props.onSearch === "function";
 
   const handleSearch = async () => {
-    if (disabled || !onSearch) return;
+    const activeInput = props.input ?? props.zone?.input;
+    const activeDraft = (typeof activeInput?.draft === "string" ? activeInput.draft : "").trim();
+
+    if (!activeDraft) {
+      alert("请先在输入框中输入你想搜索的关键词或问题，然后再点击「联网搜索」！");
+      return;
+    }
+    if (busy || !canRun) return;
+
     setBusy(true);
     try {
-      await onSearch(draft, currentSessionId);
-    } catch (error) {
+      await props.onSearch!(activeDraft, currentSessionId);
+    } catch (error: any) {
       console.error("[dsh-web-search-button] search trigger error:", error);
+      alert("搜索执行失败：" + (error?.message || String(error)));
     } finally {
       setBusy(false);
     }
@@ -42,9 +62,9 @@ export function SearchButton({ zone, sessionId, onSearch }: SearchButtonProps) {
     <button
       type="button"
       className="dsh-web-search-btn"
-      title={draft ? `联网搜索：“${draft}”` : "在输入框输入内容后点击联网搜索"}
+      title={draft ? `点击联网搜索：“${draft}”` : "点击直接调用网络工具检索（需先在输入框输入内容）"}
       onClick={handleSearch}
-      disabled={disabled}
+      disabled={busy}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -56,14 +76,16 @@ export function SearchButton({ zone, sessionId, onSearch }: SearchButtonProps) {
         border: "1px solid var(--dsw-alias-border-l2, #e0e0e0)",
         backgroundColor: busy
           ? "var(--dsw-alias-interactive-bg-active, #eaeaea)"
-          : "var(--dsw-alias-interactive-bg, transparent)",
-        color: disabled
-          ? "var(--dsw-alias-label-dimmed, #999)"
-          : "var(--dsw-alias-label-secondary, #333)",
+          : draft
+          ? "var(--dsw-alias-button-info-fill, #3b82f6)"
+          : "var(--dsw-alias-interactive-bg, rgba(0,0,0,0.05))",
+        color: draft
+          ? "#ffffff"
+          : "var(--dsw-alias-label-secondary, #666666)",
         fontSize: "12px",
         fontWeight: 500,
         lineHeight: "20px",
-        cursor: disabled ? "not-allowed" : "pointer",
+        cursor: busy ? "wait" : "pointer",
         transition: "all 0.15s ease-in-out",
         userSelect: "none",
         outline: "none",
@@ -97,8 +119,9 @@ export function apply(ctx: any) {
               }
 
               // Method 1: Use direct remote command execution channel if available
-              if (scope.remote?.commands?.execute) {
-                const res = await scope.remote.commands.execute(targetId, `/search ${query}`, []);
+              const remote = scope.remote ?? ctx.remote;
+              if (remote?.commands?.execute) {
+                const res = await remote.commands.execute(targetId, `/search ${query}`, []);
                 if (res && !res.ok) {
                   throw new Error(res.error?.message || "Command execution failed");
                 }
@@ -106,7 +129,8 @@ export function apply(ctx: any) {
               }
 
               // Method 2: Fallback to session.prompt
-              const binding = scope.sessions?.binding?.(targetId);
+              const sessions = scope.sessions ?? ctx.sessions;
+              const binding = sessions?.binding?.(targetId);
               const session = binding?.session;
               if (!session) {
                 throw new Error(`Session binding not found for ID: ${targetId}`);
