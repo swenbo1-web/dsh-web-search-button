@@ -1,7 +1,7 @@
 /**
  * Host-plane plugin for dsh-web-search-button:
  * 1. Registers the human-facing `/search` command over `ctx.web`
- * 2. Supports `/search on` and `/search off` to toggle persistent Web Search Mode
+ * 2. Silent `/search on` and `/search off` to toggle persistent Web Search Mode
  * 3. Injects system prompt guidance when Web Search Mode is active for a session
  */
 
@@ -36,7 +36,7 @@ interface CommandInvocation {
 
 interface CommandOutcome {
   kind: "success" | "error";
-  text: string;
+  text?: string;
   sourceEventSeq?: number;
 }
 
@@ -75,21 +75,15 @@ async function executeSearch(ctx: any, invocation: CommandInvocation): Promise<C
   const query = invocation.rawInput.trim();
   const sessionId = invocation.agent?.session?.sessionId;
 
-  // Mode toggles
+  // Silent mode toggles — no chat clutter
   if (query === "on") {
     if (sessionId) activeSearchSessions.add(sessionId);
-    return {
-      kind: "success",
-      text: "🌐 **联网搜索模式已开启**。后续对话中，针对时效性或需要核实的问题，模型将默认优先调用网页检索工具。",
-    };
+    return { kind: "success" };
   }
 
   if (query === "off") {
     if (sessionId) activeSearchSessions.delete(sessionId);
-    return {
-      kind: "success",
-      text: "🌐 **联网搜索模式已关闭**。后续对话已恢复普通模式。",
-    };
+    return { kind: "success" };
   }
 
   if (!query) {
@@ -129,7 +123,7 @@ async function executeSearch(ctx: any, invocation: CommandInvocation): Promise<C
 export function apply(ctx: any) {
   const active = new Set<Promise<any>>();
 
-  // 1. Dynamic System Prompt Section
+  // 1. Dynamic System Prompt Section: triggers when Web Search Mode is ON for this session
   ctx.systemPrompt.section({
     name: "tool:web_search_mode",
     order: 550,

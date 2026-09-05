@@ -156,19 +156,22 @@ DSH Desktop active profile is located at `%APPDATA%\dsh-desktop\harness\profiles
 
 ## 💡 Usage
 
-### Mode 1: Composer Button & Persistent Mode Toggle
-1. Open any session; the **🌐 联网搜索** button is displayed on the bottom-left of the input bar.
-2. Click the button to open a non-blocking configuration popover (**can be cancelled anytime by clicking outside or on "取消", never locking the input box**):
-   - Click **"✅ 开启后续自动联网搜索"**: Activates persistent Web Search Mode for this session. The button turns into an active tag `[ 🌐 联网搜索 · 已开启 ✕ ]`. All subsequent conversation questions default to using web search!
-   - Click the **`✕`** icon: Cancels and exits Web Search Mode at any time.
-   - If draft text is present, an option **"⚡ 立即单次检索当前输入内容"** allows immediate one-shot query execution.
+### Mode 1: Composer Toggle Button (Lit Up / Dimmed)
+1. Open any session; the **`[ 🌐 联网搜索 ]`** button is displayed on the bottom-left of the input bar.
+2. **Click once ➔ Directly Lits Up** (Bright green/accent background + white text + subtle glow):
+   - **Web Search Mode is ON**;
+   - Zero dialogs, zero alerts, zero prompt confirmations!
+   - All subsequent messages in this session will automatically invoke `web_search` for real-time information;
+   - Focus is smoothly preserved on the text box so you can continue typing without interruption.
+3. **Click again ➔ Directly Dims** (Neutral/muted background):
+   - **Web Search Mode is OFF**, returning to normal chat.
 
 ### Mode 2: Slash Command
 Type slash commands directly into the input bar and press Enter:
 ```text
 /search <keyword>     # One-shot direct web search
-/search on            # Enable persistent Web Search Mode for this session
-/search off           # Disable Web Search Mode for this session
+/search on            # Enable persistent Web Search Mode (turns button ON / Lit up)
+/search off           # Disable Web Search Mode (turns button OFF / Dimmed)
 ```
 
 ---
