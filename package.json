@@ -2,6 +2,14 @@
   "name": "dsh-web-search-button",
   "description": "Direct web search button and /search slash command plugin for DeepSeek Harness.",
   "version": "0.1.0",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "web-search",
+    "search",
+    "ui"
+  ],
   "license": "MIT",
   "author": "swenbot",
   "repository": {
